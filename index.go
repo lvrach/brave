@@ -9,18 +9,19 @@ import (
 )
 
 type Index struct {
-	Releases []Release
+	Releases []Release `json:"releases"`
 }
 
 //Release defines a software release
 type Release struct {
-	Name         string
-	Aliases      []string
-	Tags         []string
-	Version      string
-	Description  string
-	PackageHash  string `json:"package_hash"`
-	InstractHash string
+	Name         string   `json:"name"`
+	Aliases      []string `json:"aliases"`
+	Tags         []string `json:"tags"`
+	Version      string   `json:"version"`
+	Description  string   `json:"description"`
+	PackageHash  string   `json:"package_hash"`
+	InstructHash string   `json:"instruct_hash"`
+	Install      []string `json:"install"`
 }
 
 func GetIndex(fetcher repository.Fetcher) (Index, error) {
@@ -43,11 +44,27 @@ func GetIndex(fetcher repository.Fetcher) (Index, error) {
 }
 
 func (i Index) Find(name string) (Release, bool) {
-	for _, r := range i.Releases {
+	if ir, exist := i.findIndex(name); exist {
+		return i.Releases[ir], true
+	}
+	return Release{}, false
+}
+
+func (i *Index) Put(r Release) {
+	ri, exist := i.findIndex(r.Name)
+	if !exist {
+		i.Releases = append(i.Releases, r)
+	} else {
+		i.Releases[ri] = r
+	}
+}
+
+func (i *Index) findIndex(name string) (int, bool) {
+	for i, r := range i.Releases {
 		if r.Name == name {
-			return r, true
+			return i, true
 		}
 	}
 
-	return Release{}, false
+	return -1, false
 }

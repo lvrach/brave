@@ -40,7 +40,7 @@ func (g Downloader) Package(hash string) error {
 	dst := filepath.Join(g.WorkDir, hash)
 
 	brReader := decode.Brotli(pkgReader)
-	go unpack.Tar(dst, brReader)
+	go unpack.UnTar(dst, brReader)
 
 	write := io.MultiWriter(cache, checkSum, pkgWriter)
 

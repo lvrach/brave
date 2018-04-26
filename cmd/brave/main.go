@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	cacheDir = ".tmp/Library/Brave/cache"
-	stageDir = ".tmp/Library/Brave/stage"
+	cacheDir = "/tmp/Library/Brave/cache"
+	stageDir = "/tmp/Library/Brave/stage"
 )
 
 func main() {
@@ -86,6 +86,12 @@ func (i Command) Install(name string, useP2P bool) {
 		log.Fatal(err)
 	}
 	fmt.Println("done")
+
+	brave.Installation{
+		Steps:   release.Install,
+		WorkDir: stageDir + "/" + release.PackageHash,
+		BinDir:  "/usr/local/bin",
+	}.Run()
 }
 
 func (i Command) Share() {
